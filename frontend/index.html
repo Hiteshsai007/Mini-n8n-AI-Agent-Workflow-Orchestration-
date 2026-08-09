@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mini n8n — AI Workflow Orchestration</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="app">
+    <!-- Auth Screen -->
+    <div id="auth-screen" class="screen active">
+      <div class="auth-card glass">
+        <h1>Mini n8n</h1>
+        <p class="subtitle">AI Workflow Orchestration</p>
+        <label>Select User</label>
+        <select id="user-select">
+          <option value="">— choose a test user —</option>
+          <optgroup label="Org Alpha">
+            <option value="d0000000-0000-0000-0000-00000000a001|owner|a0000000-0000-0000-0000-000000000001|Org Alpha">Alice (Owner)</option>
+            <option value="d0000000-0000-0000-0000-00000000a002|editor|a0000000-0000-0000-0000-000000000001|Org Alpha">Bob (Editor)</option>
+            <option value="d0000000-0000-0000-0000-00000000a003|viewer|a0000000-0000-0000-0000-000000000001|Org Alpha">Carol (Viewer)</option>
+          </optgroup>
+          <optgroup label="Org Beta">
+            <option value="d0000000-0000-0000-0000-00000000b001|owner|b0000000-0000-0000-0000-000000000002|Org Beta">Dave (Owner)</option>
+            <option value="d0000000-0000-0000-0000-00000000b002|editor|b0000000-0000-0000-0000-000000000002|Org Beta">Eve (Editor)</option>
+            <option value="d0000000-0000-0000-0000-00000000b003|viewer|b0000000-0000-0000-0000-000000000002|Org Beta">Frank (Viewer)</option>
+          </optgroup>
+        </select>
+        <button id="login-btn" class="btn primary" disabled>Log In</button>
+      </div>
+    </div>
+
+    <!-- Main Screen -->
+    <div id="main-screen" class="screen">
+      <header>
+        <div class="header-left">
+          <h2 id="org-name">—</h2>
+          <span id="user-badge" class="badge"></span>
+        </div>
+        <div class="header-right">
+          <div id="quota-indicator" class="quota">
+            <span id="quota-text">—</span>
+          </div>
+          <button id="logout-btn" class="btn ghost">Logout</button>
+        </div>
+      </header>
+
+      <div class="content">
+        <!-- Workflow List -->
+        <aside id="sidebar">
+          <div class="sidebar-header">
+            <h3>Workflows</h3>
+            <button id="new-wf-btn" class="btn small primary">+ New</button>
+          </div>
+          <ul id="workflow-list"></ul>
+        </aside>
+
+        <!-- Workflow Detail / Builder -->
+        <main id="detail">
+          <div id="empty-state" class="empty">
+            <p>Select or create a workflow</p>
+          </div>
+
+          <div id="builder" class="hidden">
+            <div class="builder-header">
+              <input id="wf-name" type="text" placeholder="Workflow name" class="wf-name-input">
+              <div class="builder-actions">
+                <button id="save-wf-btn" class="btn small primary">Save</button>
+                <button id="run-wf-btn" class="btn small success">▶ Run</button>
+              </div>
+            </div>
+
+            <div id="steps-container">
+              <h4>Steps</h4>
+              <div id="steps-list"></div>
+              <div class="add-step">
+                <select id="add-step-type">
+                  <option value="llm_call">LLM Call</option>
+                  <option value="http_request">HTTP Request</option>
+                  <option value="conditional_branch">Conditional Branch</option>
+                  <option value="approval_gate">Approval Gate</option>
+                  <option value="db_write">DB Write</option>
+                  <option value="notify">Notify</option>
+                </select>
+                <button id="add-step-btn" class="btn small">+ Add Step</button>
+              </div>
+            </div>
+
+            <div id="trigger-container">
+              <h4>Trigger</h4>
+              <select id="trigger-type">
+                <option value="manual">Manual</option>
+                <option value="webhook">Webhook</option>
+                <option value="scheduled">Scheduled</option>
+                <option value="database_event">Database Event</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Run View -->
+          <div id="run-view" class="hidden">
+            <div class="run-header">
+              <h4>Run: <span id="run-id-display"></span></h4>
+              <span id="run-status" class="badge"></span>
+            </div>
+            <div id="step-runs-list"></div>
+          </div>
+        </main>
+      </div>
+    </div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

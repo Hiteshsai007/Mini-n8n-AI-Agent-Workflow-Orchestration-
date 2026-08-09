@@ -1,0 +1,54 @@
+services:
+  postgres:
+    image: postgres:15
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: minin8n
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./migrations:/docker-entrypoint-initdb.d
+
+  hasura:
+    image: hasura/graphql-engine:v2.40.0
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    restart: always
+    environment:
+      HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:postgres@postgres:5432/minin8n
+      HASURA_GRAPHQL_METADATA_DATABASE_URL: postgres://postgres:postgres@postgres:5432/minin8n
+      HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
+      HASURA_GRAPHQL_DEV_MODE: "true"
+      HASURA_GRAPHQL_ADMIN_SECRET: myadminsecret
+      HASURA_GRAPHQL_UNAUTHORIZED_ROLE: anonymous
+      HASURA_GRAPHQL_JWT_SECRET: '{"type":"HS256","key":"nhost-jwt-secret-key-min-32-chars!!"}'
+      ACTION_HANDLER_URL: http://action-handler:3001
+      HASURA_GRAPHQL_EXPERIMENTAL_FEATURES: "naming_convention"
+      HASURA_GRAPHQL_ENABLE_REMOTE_SCHEMA_PERMISSIONS: "true"
+
+  action-handler:
+    build:
+      context: ./action-handler
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    depends_on:
+      - hasura
+    restart: always
+    environment:
+      HASURA_GRAPHQL_URL: http://hasura:8080/v1/graphql
+      HASURA_ADMIN_SECRET: myadminsecret
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/minin8n
+      LLM_API_KEY: "${LLM_API_KEY:-stub}"
+      LLM_PROVIDER: "${LLM_PROVIDER:-stub}"
+      PORT: 3001
+    volumes:
+      - ./frontend:/frontend
+
+volumes:
+  pgdata:
